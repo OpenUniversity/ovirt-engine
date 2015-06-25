@@ -195,7 +195,7 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
     }
 
     protected void getDowntime() {
-        if (FeatureSupported.migrateDowntime(getVm().getClusterCompatibilityVersion())) {
+        if (FeatureSupported.migrateDowntime(getVm().getCompatibilityVersion())) {
             try {
                 VDSReturnValue retVal = runVdsCommand(VDSCommandType.MigrateStatus,
                         new MigrateStatusVDSCommandParameters(getDestinationVdsId(), getVmId()));
@@ -221,7 +221,7 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
     }
 
     private Boolean getAutoConverge() {
-        if (FeatureSupported.autoConvergence(getVm().getClusterCompatibilityVersion())) {
+        if (FeatureSupported.autoConvergence(getVm().getCompatibilityVersion())) {
             if (getVm().getAutoConverge() != null) {
                 return getVm().getAutoConverge();
             }
@@ -237,7 +237,7 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
     }
 
     private Boolean getMigrateCompressed() {
-        if (FeatureSupported.migrationCompression(getVm().getClusterCompatibilityVersion())) {
+        if (FeatureSupported.migrationCompression(getVm().getCompatibilityVersion())) {
             if (getVm().getMigrateCompressed() != null) {
                 return getVm().getMigrateCompressed();
             }
@@ -261,7 +261,7 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
     }
 
     private boolean isTunnelMigrationUsed() {
-        if (!FeatureSupported.tunnelMigration(getVm().getClusterCompatibilityVersion())) {
+        if (!FeatureSupported.tunnelMigration(getVm().getCompatibilityVersion())) {
             return false;
         }
         // if vm has no override for tunnel migration (its null),
@@ -273,7 +273,7 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
 
     private String getMigrationNetworkIp() {
 
-        if (!FeatureSupported.migrationNetwork(getVm().getClusterCompatibilityVersion())) {
+        if (!FeatureSupported.migrationNetwork(getVm().getCompatibilityVersion())) {
             return null;
         }
 
