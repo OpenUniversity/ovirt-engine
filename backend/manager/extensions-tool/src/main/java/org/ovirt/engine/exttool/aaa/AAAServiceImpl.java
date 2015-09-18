@@ -222,10 +222,10 @@ public class AAAServiceImpl implements ModuleService {
                         Dump.AUTH_RECORD.dump(module, authRecord);
                     }
 
-                    log.info(
+                    /*log.info(
                         "API: -->Authz.InvokeCommands.FETCH_PRINCIPAL_RECORD principal='{}'",
                         (Object) authRecord.get(Authn.AuthRecord.PRINCIPAL)
-                    );
+                    );*/
                     outMap = module.getExtensionsManager().getExtensionByName(aaaprofile.getAuthzName()).invoke(
                         new ExtMap().
                             mput(
