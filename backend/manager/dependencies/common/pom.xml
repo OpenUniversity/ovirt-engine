@@ -397,6 +397,11 @@
           <configuration>
             <generateIndex>false</generateIndex>
             <modules>
+              <module>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjrt</artifactId>
+                <moduleName>org.aspectj</moduleName>
+              </module>
 
               <module>
                 <groupId>commons-configuration</groupId>
