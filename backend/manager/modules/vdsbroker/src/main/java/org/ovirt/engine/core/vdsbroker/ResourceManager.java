@@ -440,7 +440,7 @@ public class ResourceManager implements BackendService {
         return cmd;
     }
 
-    private <P extends VdsIdVDSCommandParametersBase> FutureVDSCommand createFutureCommand(FutureVDSCommandType commandType,
+    private <P extends VdsIdVDSCommandParametersBase> FutureVDSCommand<P> createFutureCommand(FutureVDSCommandType commandType,
             P parameters) {
         try {
             Class<FutureVDSCommand> type =

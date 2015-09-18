@@ -213,7 +213,7 @@ public class AAAServiceImpl implements ModuleService {
                         Dump.AUTH_RECORD.dump(module, authRecord);
                     }
 
-                    log.info("API: -->Authz.InvokeCommands.FETCH_PRINCIPAL_RECORD principal='{}'", authRecord.get(Authn.AuthRecord.PRINCIPAL));
+                    // log.info("API: -->Authz.InvokeCommands.FETCH_PRINCIPAL_RECORD principal='{}'", authRecord.get(Authn.AuthRecord.PRINCIPAL));
                     outMap = authzExtension.invoke(
                         new ExtMap().
                             mput(
