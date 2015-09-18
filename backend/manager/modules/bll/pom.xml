@@ -158,6 +158,10 @@
       <version>${hamcrest.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -225,6 +229,14 @@
               </manifestEntries>
             </archive>
           </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>aspectj-maven-plugin</artifactId>
+          <configuration>
+           <showWeaveInfo>true</showWeaveInfo>
+         </configuration>
         </plugin>
     </plugins>
   </build>
