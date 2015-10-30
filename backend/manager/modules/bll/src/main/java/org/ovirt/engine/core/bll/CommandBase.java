@@ -2448,4 +2448,7 @@ public abstract class CommandBase<T extends VdcActionParametersBase>
             cancelTasks();
         }
     }
+
+    protected void freeLock() {
+    }
 }
