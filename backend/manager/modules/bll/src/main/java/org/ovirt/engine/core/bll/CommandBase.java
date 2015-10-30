@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.TransactionRolledbackLocalException;
@@ -61,7 +60,6 @@ import org.ovirt.engine.core.common.businessentities.BusinessEntitySnapshot;
 import org.ovirt.engine.core.common.businessentities.BusinessEntitySnapshot.EntityStatusSnapshot;
 import org.ovirt.engine.core.common.businessentities.BusinessEntitySnapshot.SnapshotType;
 import org.ovirt.engine.core.common.businessentities.CommandEntity;
-import org.ovirt.engine.core.common.businessentities.IVdsAsyncCommand;
 import org.ovirt.engine.core.common.businessentities.QuotaEnforcementTypeEnum;
 import org.ovirt.engine.core.common.businessentities.StoragePool;
 import org.ovirt.engine.core.common.businessentities.aaa.DbUser;
@@ -395,7 +393,6 @@ public abstract class CommandBase<T extends VdcActionParametersBase> extends Aud
                 getReturnValue().setCanDoAction(false);
             }
         } finally {
-            freeLockExecute();
             clearAsyncTasksWithOutVdsmId();
         }
         return getReturnValue();
@@ -534,33 +531,18 @@ public abstract class CommandBase<T extends VdcActionParametersBase> extends Aud
         }
 
         try {
-            initiateLockEndAction();
             setActionState();
             handleTransactivity();
             TransactionSupport.executeInScope(endActionScope, this);
         } catch (TransactionRolledbackLocalException e) {
             log.info("endAction: Transaction was aborted in {}", this.getClass().getName());
         } finally {
-            freeLockEndAction();
             if (getCommandShouldBeLogged()) {
                 logCommand();
             }
         }
 
         return getReturnValue();
-    }
-
-    /**
-     * The following method should initiate a lock , in order to release it at endAction()
-     */
-    private void initiateLockEndAction() {
-        if (context.getLock() == null) {
-            LockProperties lockProperties = getLockProperties();
-            if (Scope.Command.equals(lockProperties.getScope())) {
-                context.withLock(buildLock());
-            }
-
-        }
     }
 
     private void handleTransactivity() {
@@ -619,7 +601,6 @@ public abstract class CommandBase<T extends VdcActionParametersBase> extends Aud
             exceptionOccurred = true;
             throw e;
         } finally {
-            freeLockEndAction();
             if (TransactionSupport.current() == null) {
 
                 // In the unusual case that we have no current transaction, try to cleanup after yourself and if the
@@ -824,10 +805,6 @@ public abstract class CommandBase<T extends VdcActionParametersBase> extends Aud
         } catch (RuntimeException ex) {
             log.error("Error during CanDoActionFailure.", ex);
             addCanDoActionMessage(EngineMessage.CAN_DO_ACTION_GENERAL_FAILURE);
-        } finally {
-            if (!returnValue) {
-                freeLock();
-            }
         }
         return returnValue;
     }
@@ -1855,17 +1832,7 @@ public abstract class CommandBase<T extends VdcActionParametersBase> extends Aud
     }
 
     protected boolean acquireLock() {
-        LockProperties lockProperties = getLockProperties();
-        boolean returnValue = true;
-        if (!Scope.None.equals(lockProperties.getScope())) {
-            releaseLocksAtEndOfExecute = Scope.Execution.equals(lockProperties.getScope());
-            if (!lockProperties.isWait()) {
-                returnValue = acquireLockInternal();
-            } else {
-                acquireLockAndWait();
-            }
-        }
-        return returnValue;
+        return true;
     }
 
     /**
@@ -1884,22 +1851,6 @@ public abstract class CommandBase<T extends VdcActionParametersBase> extends Aud
     }
 
     protected boolean acquireLockInternal() {
-        // if commandLock is null then we acquire new lock, otherwise probably we got lock from caller command.
-        if (context.getLock() == null) {
-            EngineLock lock = buildLock();
-            if (lock != null) {
-                Pair<Boolean, Set<String>> lockAcquireResult = getLockManager().acquireLock(lock);
-                if (lockAcquireResult.getFirst()) {
-                    log.info("Lock Acquired to object '{}'", lock);
-                    context.withLock(lock);
-                } else {
-                    log.info("Failed to Acquire Lock to object '{}'", lock);
-                    getReturnValue().getCanDoActionMessages()
-                    .addAll(extractVariableDeclarations(lockAcquireResult.getSecond()));
-                    return false;
-                }
-            }
-        }
         return true;
     }
 
@@ -1921,55 +1872,24 @@ public abstract class CommandBase<T extends VdcActionParametersBase> extends Aud
         return result;
     }
 
-    private EngineLock buildLock() {
-        EngineLock lock = null;
-        Map<String, Pair<String, String>> exclusiveLocks = getExclusiveLocks();
-        Map<String, Pair<String, String>> sharedLocks = getSharedLocks();
-        if (exclusiveLocks != null || sharedLocks != null) {
-            lock = new EngineLock(exclusiveLocks, sharedLocks);
-        }
-        return lock;
-    }
-
     private void acquireLockAndWait() {
-        // if commandLock is null then we acquire new lock, otherwise probably we got lock from caller command.
-        if (context.getLock() == null) {
-            Map<String, Pair<String, String>> exclusiveLocks = getExclusiveLocks();
-            if (exclusiveLocks != null) {
-                EngineLock lock = new EngineLock(exclusiveLocks, null);
-                getLockManager().acquireLockWait(lock);
-                context.withLock(lock);
-            }
-        }
     }
 
-    private void freeLockExecute() {
-        if (releaseLocksAtEndOfExecute || !getSucceeded() ||
-                (noAsyncOperations() && !(this instanceof IVdsAsyncCommand))) {
-            freeLock();
-        }
-    }
 
-    /**
-     * If the command has more than one task handler, we can reach the end action
-     * phase and in that phase execute the next task handler. In that case, we
-     * don't want to release the locks, so we ask whether we're not in execute state.
-     */
-    private void freeLockEndAction() {
-        if (getActionState() != CommandActionState.EXECUTE) {
-            freeLock();
+       /**
+         * The following method should return a map which is represent exclusive lock
+         */
+        protected Map<String, Pair<String, String>> getExclusiveLocks() {
+          return null;
         }
-    }
 
-    protected void freeLock() {
-        if (context.getLock() != null) {
-            getLockManager().releaseLock(context.getLock());
-            log.info("Lock freed to object '{}'", context.getLock());
-            context.withLock(null);
-            // free other locks here to guarantee they will be freed only once
-            freeCustomLocks();
-        }
-    }
+                    /**
+                     * The following method should return a map which is represent shared lock
+                     */
+                    protected Map<String, Pair<String, String>> getSharedLocks() {
+                        return null;
+                    }
+
 
     /** hook for subclasses that hold additional custom locks */
     protected void freeCustomLocks() {
@@ -1977,20 +1897,6 @@ public abstract class CommandBase<T extends VdcActionParametersBase> extends Aud
 
     protected LockManager getLockManager() {
         return LockManagerFactory.getLockManager();
-    }
-
-    /**
-     * The following method should return a map which is represent exclusive lock
-     */
-    protected Map<String, Pair<String, String>> getExclusiveLocks() {
-        return null;
-    }
-
-    /**
-     * The following method should return a map which is represent shared lock
-     */
-    protected Map<String, Pair<String, String>> getSharedLocks() {
-        return null;
     }
 
     @Override
@@ -2442,5 +2348,8 @@ public abstract class CommandBase<T extends VdcActionParametersBase> extends Aud
 
     protected final <P extends VdcActionParametersBase> P withRootCommandInfo(P params) {
         return withRootCommandInfo(params, getActionType());
+    }
+
+    protected void freeLock() {
     }
 }
