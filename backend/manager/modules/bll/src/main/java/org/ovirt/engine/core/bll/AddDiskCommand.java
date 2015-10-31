@@ -614,12 +614,16 @@ public class AddDiskCommand<T extends AddDiskParameters> extends AbstractDiskVmC
 
     @Override
     protected Map<String, Pair<String, String>> getExclusiveLocks() {
-        if (getParameters().getDiskInfo().isBoot() && getParameters().getVmId() != null
+        if (isBootableDisk() && getParameters().getVmId() != null
                 && !Guid.Empty.equals(getParameters().getVmId())) {
             return Collections.singletonMap(getParameters().getVmId().toString(),
                     LockMessagesMatchUtil.makeLockingPair(LockingGroup.VM_DISK_BOOT, EngineMessage.ACTION_TYPE_FAILED_OBJECT_LOCKED));
         }
         return null;
+    }
+
+    protected boolean isBootableDisk() {
+        return getParameters().getDiskInfo().isBoot();
     }
 
     @Override
