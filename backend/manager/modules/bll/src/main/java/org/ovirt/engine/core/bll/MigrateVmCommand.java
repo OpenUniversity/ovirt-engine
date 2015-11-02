@@ -16,8 +16,6 @@ import org.ovirt.engine.core.bll.validator.storage.DiskImagesValidator;
 import org.ovirt.engine.core.common.AuditLogType;
 import org.ovirt.engine.core.common.FeatureSupported;
 import org.ovirt.engine.core.common.action.ChangeVMClusterParameters;
-import org.ovirt.engine.core.common.action.LockProperties;
-import org.ovirt.engine.core.common.action.LockProperties.Scope;
 import org.ovirt.engine.core.common.action.MigrateVmParameters;
 import org.ovirt.engine.core.common.action.VdcActionType;
 import org.ovirt.engine.core.common.businessentities.MigrationMethod;
@@ -65,11 +63,6 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
             // force reload
             setVdsGroup(null);
         }
-    }
-
-    @Override
-    protected LockProperties applyLockProperties(LockProperties lockProperties) {
-        return lockProperties.withScope(Scope.Command);
     }
 
     /**
@@ -515,13 +508,6 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
     // ActualDowntime: returns the actual time that the vm was offline (not available for access)
     public String getActualDowntime() {
         return (actualDowntime == null) ? "(N/A)" : actualDowntime + "ms";
-    }
-
-    @Override
-    protected String getLockMessage() {
-        StringBuilder builder = new StringBuilder(EngineMessage.ACTION_TYPE_FAILED_VM_IS_BEING_MIGRATED.name());
-        builder.append(String.format("$VmName %1$s", getVmName()));
-        return builder.toString();
     }
 
     // hosts that cannot be selected for scheduling (failed hosts + VM source host)

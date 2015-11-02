@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -53,8 +52,6 @@ import org.ovirt.engine.core.common.businessentities.storage.StorageType;
 import org.ovirt.engine.core.common.config.Config;
 import org.ovirt.engine.core.common.config.ConfigValues;
 import org.ovirt.engine.core.common.errors.EngineMessage;
-import org.ovirt.engine.core.common.locks.LockingGroup;
-import org.ovirt.engine.core.common.utils.Pair;
 import org.ovirt.engine.core.common.validation.group.UpdateEntity;
 import org.ovirt.engine.core.compat.Guid;
 import org.ovirt.engine.core.dal.dbbroker.DbFacade;
@@ -612,27 +609,8 @@ public class AddDiskCommand<T extends AddDiskParameters> extends AbstractDiskVmC
         return super.getValidationGroups();
     }
 
-    @Override
-    protected Map<String, Pair<String, String>> getExclusiveLocks() {
-        if (isBootableDisk() && getParameters().getVmId() != null
-                && !Guid.Empty.equals(getParameters().getVmId())) {
-            return Collections.singletonMap(getParameters().getVmId().toString(),
-                    LockMessagesMatchUtil.makeLockingPair(LockingGroup.VM_DISK_BOOT, EngineMessage.ACTION_TYPE_FAILED_OBJECT_LOCKED));
-        }
-        return null;
-    }
-
     protected boolean isBootableDisk() {
         return getParameters().getDiskInfo().isBoot();
-    }
-
-    @Override
-    protected Map<String, Pair<String, String>> getSharedLocks() {
-        if (!Guid.isNullOrEmpty(getParameters().getVmId()) && !isInternalExecution()) {
-            return Collections.singletonMap(getParameters().getVmId().toString(),
-                    LockMessagesMatchUtil.makeLockingPair(LockingGroup.VM, EngineMessage.ACTION_TYPE_FAILED_OBJECT_LOCKED));
-        }
-        return null;
     }
 
     @Override
