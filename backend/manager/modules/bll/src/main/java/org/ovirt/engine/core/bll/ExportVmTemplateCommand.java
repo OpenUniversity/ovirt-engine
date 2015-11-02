@@ -1,6 +1,5 @@
 package org.ovirt.engine.core.bll;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,8 +7,6 @@ import java.util.Map;
 import org.ovirt.engine.core.bll.validator.storage.StorageDomainValidator;
 import org.ovirt.engine.core.common.AuditLogType;
 import org.ovirt.engine.core.common.VdcObjectType;
-import org.ovirt.engine.core.common.action.LockProperties;
-import org.ovirt.engine.core.common.action.LockProperties.Scope;
 import org.ovirt.engine.core.common.action.MoveOrCopyImageGroupParameters;
 import org.ovirt.engine.core.common.action.MoveOrCopyParameters;
 import org.ovirt.engine.core.common.action.VdcActionParametersBase;
@@ -21,8 +18,6 @@ import org.ovirt.engine.core.common.businessentities.storage.DiskImage;
 import org.ovirt.engine.core.common.businessentities.storage.ImageDbOperationScope;
 import org.ovirt.engine.core.common.errors.EngineException;
 import org.ovirt.engine.core.common.errors.EngineMessage;
-import org.ovirt.engine.core.common.locks.LockingGroup;
-import org.ovirt.engine.core.common.utils.Pair;
 import org.ovirt.engine.core.compat.Guid;
 import org.ovirt.engine.core.compat.KeyValuePairCompat;
 import org.ovirt.engine.core.utils.transaction.TransactionMethod;
@@ -43,11 +38,6 @@ public class ExportVmTemplateCommand<T extends MoveOrCopyParameters> extends Mov
 
     protected ExportVmTemplateCommand(Guid commandId) {
         super(commandId);
-    }
-
-    @Override
-    protected LockProperties applyLockProperties(LockProperties lockProperties) {
-        return lockProperties.withScope(Scope.Command);
     }
 
     @Override
@@ -87,18 +77,6 @@ public class ExportVmTemplateCommand<T extends MoveOrCopyParameters> extends Mov
                 return null;
             }
         });
-    }
-
-    @Override
-    protected Map<String, Pair<String, String>> getExclusiveLocks() {
-        return Collections.singletonMap(getVmTemplateId().toString(),
-                LockMessagesMatchUtil.makeLockingPair(LockingGroup.REMOTE_TEMPLATE, getTemplateIsBeingExportedMessage()));
-    }
-
-    @Override
-    protected Map<String, Pair<String, String>> getSharedLocks() {
-        return Collections.singletonMap(getVmTemplateId().toString(),
-                LockMessagesMatchUtil.makeLockingPair(LockingGroup.TEMPLATE, getTemplateIsBeingExportedMessage()));
     }
 
     @Override
