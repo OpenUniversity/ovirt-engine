@@ -110,10 +110,10 @@
 	        } finally {
 	            commandBase.freeLockEndAction();
 	        }
-	        return result;
-	    }
+	                return result;
+	        }
 	
-	    private void CommandBase.freeLockExecute() {
+	   private void CommandBase.freeLockExecute() {
 	        if (releaseLocksAtEndOfExecute || !getSucceeded() ||
 	                (noAsyncOperations() && !(this instanceof IVdsAsyncCommand))) {
 	            freeLock();
@@ -156,62 +156,27 @@
 
 		
 
-		LockProperties around(LockProperties lockProperties, org.ovirt.engine.core.bll.ExportVmTemplateCommand command): execution(* applyLockProperties(..)) && args(lockProperties) && target(command) {
-			return lockProperties.withScope(Scope.Execution);
-		}
+			LockProperties around(LockProperties lockProperties, org.ovirt.engine.core.bll.ExportVmTemplateCommand command): execution(* applyLockProperties(..)) && args(lockProperties) && target(command) {
+				return lockProperties.withScope(Scope.Execution);
+			}
 		
-		Map<String, Pair<String, String>> around(org.ovirt.engine.core.bll.ExportVmTemplateCommand command): execution(* getExclusiveLocks()) && target(command) {
-			Map<String, Pair<String, String>> locks = new HashMap<String, Pair<String, String>>();
+			Map<String, Pair<String, String>> around(org.ovirt.engine.core.bll.ExportVmTemplateCommand command): execution(* getExclusiveLocks()) && target(command) {
+			        Map<String, Pair<String, String>> locks = new HashMap<String, Pair<String, String>>();
 		
-			locks.put(command.getVmTemplateId().toString(),
-				LockMessagesMatchUtil.makeLockingPair(LockingGroup.REMOTE_TEMPLATE, EngineMessage.ACTION_TYPE_FAILED_OBJECT_LOCKED));
+		locks.put(command.getVmTemplateId().toString(),
+			LockMessagesMatchUtil.makeLockingPair(LockingGroup.REMOTE_TEMPLATE, EngineMessage.ACTION_TYPE_FAILED_OBJECT_LOCKED));
 		
-			return locks;
-		}
+				return locks;
+			    }
 		
 		Map<String, Pair<String, String>> around(org.ovirt.engine.core.bll.ExportVmTemplateCommand command): execution(* getSharedLocks()) && target(command) {
-			Map<String, Pair<String, String>> locks = new HashMap<String, Pair<String, String>>();
+		    Map<String, Pair<String, String>> locks = new HashMap<String, Pair<String, String>>();
 		
-			locks.put(command.getVmTemplateId().toString(),
-				LockMessagesMatchUtil.makeLockingPair(LockingGroup.TEMPLATE, EngineMessage.ACTION_TYPE_FAILED_OBJECT_LOCKED));
+		locks.put(command.getVmTemplateId().toString(),
+			LockMessagesMatchUtil.makeLockingPair(LockingGroup.TEMPLATE, EngineMessage.ACTION_TYPE_FAILED_OBJECT_LOCKED));
 		
-			return locks;
-		}
-		
-		LockProperties around(LockProperties lockProperties, org.ovirt.engine.core.bll.MigrateVmCommand command): execution(* applyLockProperties(..)) && args(lockProperties) && target(command) {
-			return lockProperties.withScope(Scope.Command);
-		}
-		
-		Map<String, Pair<String, String>> around(org.ovirt.engine.core.bll.MigrateVmCommand command): execution(* getExclusiveLocks()) && target(command) {
-			Map<String, Pair<String, String>> locks = new HashMap<String, Pair<String, String>>();
-		
-			locks.put(command.getVmId().toString(),
-				LockMessagesMatchUtil.makeLockingPair(LockingGroup.VM, EngineMessage.ACTION_TYPE_FAILED_OBJECT_LOCKED));
-		
-			return locks;
-		}
-		
-		
-		LockProperties around(LockProperties lockProperties, org.ovirt.engine.core.bll.AddDiskCommand command): execution(* applyLockProperties(..)) && args(lockProperties) && target(command) {
-			return lockProperties.withScope(Scope.Execution);
-		}
-		
-		Map<String, Pair<String, String>> around(org.ovirt.engine.core.bll.AddDiskCommand command): execution(* getExclusiveLocks()) && target(command) {
-			Map<String, Pair<String, String>> locks = new HashMap<String, Pair<String, String>>();
-		
-			locks.put(command.getVmId().toString(),
-				LockMessagesMatchUtil.makeLockingPair(LockingGroup.VM_DISK_BOOT, EngineMessage.ACTION_TYPE_FAILED_OBJECT_LOCKED));
-		
-			return locks;
-		}
-		
-		Map<String, Pair<String, String>> around(org.ovirt.engine.core.bll.AddDiskCommand command): execution(* getSharedLocks()) && target(command) {
-			Map<String, Pair<String, String>> locks = new HashMap<String, Pair<String, String>>();
-		
-			locks.put(command.getVmId().toString(),
-				LockMessagesMatchUtil.makeLockingPair(LockingGroup.VM, EngineMessage.ACTION_TYPE_FAILED_OBJECT_LOCKED));
-		
-			return locks;
+		    return locks;
 		}
 		
 	}
+
