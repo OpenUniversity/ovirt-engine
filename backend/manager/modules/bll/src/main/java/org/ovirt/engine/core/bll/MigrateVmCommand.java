@@ -160,7 +160,7 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
     }
 
     private boolean migrateVm() {
-        setActionReturnValue(Backend.getInstance().getResourceManager()
+        setActionReturnValue(getVdsBroker()
                 .RunAsyncVdsCommand(
                         VDSCommandType.Migrate,
                         createMigrateVDSCommandParameters(),
@@ -481,8 +481,7 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
     protected void determineMigrationFailureForAuditLog() {
         if (getVm() != null && getVm().getStatus() == VMStatus.Up) {
             try {
-                runVdsCommand(VDSCommandType.MigrateStatus,
-                        new MigrateStatusVDSCommandParameters(getVdsId(), getVmId()));
+                runVdsCommand(VDSCommandType.MigrateStatus, new MigrateStatusVDSCommandParameters(getVdsId(), getVmId()));
             } catch (EngineException e) {
                 migrationErrorCode = e.getErrorCode();
             }
