@@ -123,6 +123,7 @@ public abstract class CommandBase<T extends VdcActionParametersBase>
     private TransactionScopeOption scope;
     private TransactionScopeOption endActionScope;
     private List<QuotaConsumptionParameter> consumptionParameters;
+    protected Map<String, Serializable> commandData;
 
     @Inject
     private QuotaManager quotaManager;
@@ -187,6 +188,7 @@ public abstract class CommandBase<T extends VdcActionParametersBase>
             cmdContext.getEngineContext().withSessionId(parameters.getSessionId());
         }
         this.context = cmdContext;
+        this.commandData = new HashMap<>();
         _parameters = parameters;
 
         Guid commandIdFromParameters = parameters.getCommandId();
@@ -218,6 +220,7 @@ public abstract class CommandBase<T extends VdcActionParametersBase>
     protected CommandBase(Guid commandId) {
         this.context = new CommandContext(new EngineContext());
         this.commandId = commandId;
+        this.commandData = new HashMap<>();
     }
 
     /**
@@ -1532,6 +1535,14 @@ public abstract class CommandBase<T extends VdcActionParametersBase>
         return annotation == null;
     }
 
+    public Map<String, Serializable> getCommandData() {
+        return commandData;
+    }
+
+    public void setCommandData(Map<String, Serializable> commandData) {
+        this.commandData = commandData;
+    }
+
     @Override
     public T getParameters() {
         return _parameters;
@@ -2229,6 +2240,10 @@ public abstract class CommandBase<T extends VdcActionParametersBase>
         return returnValue;
     }
 
+    public void updateCommandData() {
+        CommandCoordinatorUtil.updateCommandData(getCommandId(), commandData);
+    }
+
     public void persistCommand(VdcActionType parentCommand) {
         persistCommand(parentCommand, getContext(), false);
     }
@@ -2261,7 +2276,8 @@ public abstract class CommandBase<T extends VdcActionParametersBase>
                 getParameters(),
                 commandStatus,
                 enableCallback,
-                getReturnValue());
+                getReturnValue(),
+                getCommandData());
     }
 
     protected void removeCommand() {
