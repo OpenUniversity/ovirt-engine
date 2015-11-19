@@ -94,7 +94,8 @@ import org.ovirt.engine.core.utils.SerializationFactory;
 import org.ovirt.engine.core.utils.lock.EngineLock;
 import org.ovirt.engine.core.utils.lock.LockManager;
 import org.ovirt.engine.core.utils.lock.LockManagerFactory;
-import org.ovirt.engine.core.utils.transaction.RollbackHandler;
+import org.ovirt.engine.core.utils.transaction.NoOpTransactionCompletionListener;
+import org.ovirt.engine.core.utils.transaction.TransactionCompletionListener;
 import org.ovirt.engine.core.utils.transaction.TransactionMethod;
 import org.ovirt.engine.core.utils.transaction.TransactionSupport;
 import org.slf4j.Logger;
@@ -103,8 +104,9 @@ import org.springframework.dao.DataAccessException;
 
 import com.woorea.openstack.base.client.OpenStackResponseException;
 
-public abstract class CommandBase<T extends VdcActionParametersBase> extends AuditLogableBase implements
-        RollbackHandler, TransactionMethod<Object>, Command<T> {
+public abstract class CommandBase<T extends VdcActionParametersBase>
+        extends AuditLogableBase
+        implements TransactionMethod<Object>, Command<T> {
 
     /* Multiplier used to convert GB to bytes or vice versa. */
     protected static final long BYTES_IN_GB = 1024 * 1024 * 1024;
@@ -120,6 +122,7 @@ public abstract class CommandBase<T extends VdcActionParametersBase> extends Aud
     private TransactionScopeOption scope;
     private TransactionScopeOption endActionScope;
     private List<QuotaConsumptionParameter> consumptionParameters;
+
     @Inject
     private QuotaManager quotaManager;
 
@@ -1374,9 +1377,7 @@ public abstract class CommandBase<T extends VdcActionParametersBase> extends Aud
     }
 
     private void executeActionInTransactionScope() {
-        if (TransactionSupport.current() != null) {
-            TransactionSupport.registerRollbackHandler(CommandBase.this);
-        }
+        registerRollbackHandler(new DefaultCommandTransactionCompletionListener());
 
         // If we didn't managed to acquire lock for command or the object wasn't managed to execute properly, then
         // rollback the transaction.
@@ -1387,6 +1388,12 @@ public abstract class CommandBase<T extends VdcActionParametersBase> extends Aud
 
             // we don't want to commit transaction here
             TransactionSupport.setRollbackOnly();
+        }
+    }
+
+    protected void registerRollbackHandler(TransactionCompletionListener transactionCompletionListener) {
+        if (TransactionSupport.current() != null) {
+            TransactionSupport.registerRollbackHandler(transactionCompletionListener);
         }
     }
 
@@ -1807,19 +1814,6 @@ public abstract class CommandBase<T extends VdcActionParametersBase> extends Aud
     protected ArrayList<Guid> getTaskIdList() {
         return getParameters().getParentCommand() != VdcActionType.Unknown ? getReturnValue().getInternalVdsmTaskIdList()
                 : getReturnValue().getVdsmTaskIdList();
-    }
-
-    @Override
-    public void rollback() {
-        log.error("Transaction rolled-back for command '{}'.", CommandBase.this.getClass().getName());
-        try {
-            if (isQuotaDependant()) {
-                rollbackQuota();
-            }
-        } catch (NullPointerException e) {
-            log.error("RollbackQuota: failed (may be because quota is disabled)", e);
-        }
-        cancelTasks();
     }
 
     private void cancelTasks() {
@@ -2386,5 +2380,21 @@ public abstract class CommandBase<T extends VdcActionParametersBase> extends Aud
     }
 
     protected void freeLock() {
+    }
+
+    private class DefaultCommandTransactionCompletionListener extends NoOpTransactionCompletionListener {
+
+        @Override
+        public void onRollback() {
+            log.error("Transaction rolled-back for command '{}'.", CommandBase.this.getClass().getName());
+            try {
+                if (isQuotaDependant()) {
+                    rollbackQuota();
+                }
+            } catch (NullPointerException e) {
+                log.error("RollbackQuota: failed (may be because quota is disabled)", e);
+            }
+            cancelTasks();
+        }
     }
 }
