@@ -162,7 +162,7 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
 
     private boolean migrateVm() {
         setActionReturnValue(getVdsBroker()
-                .RunAsyncVdsCommand(
+                .runAsyncVdsCommand(
                         VDSCommandType.Migrate,
                         createMigrateVDSCommandParameters(),
                         this)
