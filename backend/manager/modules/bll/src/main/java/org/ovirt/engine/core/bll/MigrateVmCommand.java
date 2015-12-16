@@ -371,11 +371,11 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
     }
 
     @Override
-    protected boolean canDoAction() {
+    protected boolean validate() {
         final VM vm = getVm();
 
         if (vm == null) {
-            return failCanDoAction(EngineMessage.ACTION_TYPE_FAILED_VM_NOT_FOUND);
+            return failValidation(EngineMessage.ACTION_TYPE_FAILED_VM_NOT_FOUND);
         }
 
         if (!canRunActionOnNonManagedVm()) {
@@ -388,29 +388,29 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
         }
 
         if (!FeatureSupported.isMigrationSupported(getVdsGroup().getArchitecture(), getVdsGroup().getCompatibilityVersion())) {
-            return failCanDoAction(EngineMessage.MIGRATION_IS_NOT_SUPPORTED);
+            return failValidation(EngineMessage.MIGRATION_IS_NOT_SUPPORTED);
         }
 
         // If VM is pinned to host, no migration can occur
         if (vm.getMigrationSupport() == MigrationSupport.PINNED_TO_HOST) {
-            return failCanDoAction(EngineMessage.ACTION_TYPE_FAILED_VM_IS_PINNED_TO_HOST);
+            return failValidation(EngineMessage.ACTION_TYPE_FAILED_VM_IS_PINNED_TO_HOST);
         }
 
         if (vm.getMigrationSupport() == MigrationSupport.IMPLICITLY_NON_MIGRATABLE
                 && !getParameters().isForceMigrationForNonMigratableVm()) {
-            return failCanDoAction(EngineMessage.ACTION_TYPE_FAILED_VM_IS_NON_MIGRTABLE_AND_IS_NOT_FORCED_BY_USER_TO_MIGRATE);
+            return failValidation(EngineMessage.ACTION_TYPE_FAILED_VM_IS_NON_MIGRTABLE_AND_IS_NOT_FORCED_BY_USER_TO_MIGRATE);
         }
 
         switch (vm.getStatus()) {
         case MigratingFrom:
-            return failCanDoAction(EngineMessage.ACTION_TYPE_FAILED_MIGRATION_IN_PROGRESS);
+            return failValidation(EngineMessage.ACTION_TYPE_FAILED_MIGRATION_IN_PROGRESS);
 
         case NotResponding:
             return failVmStatusIllegal();
 
         case Paused:
             if (vm.getVmPauseStatus() == VmPauseStatus.EIO) {
-                return failCanDoAction(EngineMessage.MIGRATE_PAUSED_EIO_VM_IS_NOT_SUPPORTED);
+                return failValidation(EngineMessage.MIGRATE_PAUSED_EIO_VM_IS_NOT_SUPPORTED);
             }
             break;
 
@@ -418,7 +418,7 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
         }
 
         if (!vm.isQualifyToMigrate()) {
-            return failCanDoAction(EngineMessage.ACTION_TYPE_FAILED_VM_IS_NOT_RUNNING);
+            return failValidation(EngineMessage.ACTION_TYPE_FAILED_VM_IS_NOT_RUNNING);
         }
 
         if (!validate(vmValidator.vmNotHavingPluggedDiskSnapshots(EngineMessage.ACTION_TYPE_FAILED_VM_HAS_PLUGGED_DISK_SNAPSHOT))
@@ -442,13 +442,13 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
                         getVdsBlackList(),
                         getParameters().getInitialHosts(),
                         getDestinationHostList(),
-                        getReturnValue().getCanDoActionMessages());
+                        getReturnValue().getValidationMessages());
     }
 
     @Override
     protected void setActionMessageParameters() {
-        addCanDoActionMessage(EngineMessage.VAR__ACTION__MIGRATE);
-        addCanDoActionMessage(EngineMessage.VAR__TYPE__VM);
+        addValidationMessage(EngineMessage.VAR__ACTION__MIGRATE);
+        addValidationMessage(EngineMessage.VAR__TYPE__VM);
     }
 
     @Override
@@ -529,7 +529,7 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
     public List<PermissionSubject> getPermissionCheckSubjects() {
         List<PermissionSubject> permissionList = super.getPermissionCheckSubjects();
 
-        // this runs before canDoAction so the getVm() can be null - instead of failing on NPE here we pass the parent permissions and let the canDoAction to return proper error
+        // this runs before validate so the getVm() can be null - instead of failing on NPE here we pass the parent permissions and let the validate to return proper error
         if (getVm() == null) {
             return permissionList;
         }
