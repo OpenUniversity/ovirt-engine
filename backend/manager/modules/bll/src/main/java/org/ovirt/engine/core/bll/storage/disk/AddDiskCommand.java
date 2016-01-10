@@ -77,7 +77,7 @@ public class AddDiskCommand<T extends AddDiskParameters> extends AbstractDiskVmC
     /**
      * Constructor for command creation when compensation is applied on startup
      */
-    protected AddDiskCommand(Guid commandId) {
+    public AddDiskCommand(Guid commandId) {
         super(commandId);
     }
 
