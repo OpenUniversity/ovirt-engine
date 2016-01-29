@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.ovirt.engine.core.bll.DisableInPrepareMode;
-import org.ovirt.engine.core.bll.LockMessagesMatchUtil;
 import org.ovirt.engine.core.bll.VmHandler;
 import org.ovirt.engine.core.bll.VmTemplateHandler;
 import org.ovirt.engine.core.bll.storage.ovfstore.OvfUpdateProcessHelper;
