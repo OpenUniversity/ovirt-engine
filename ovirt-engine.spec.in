@@ -78,7 +78,7 @@
 %global engine_log %{_localstatedir}/log/%{engine_name}
 %global engine_name ovirt-engine
 %global engine_pki %{_sysconfdir}/pki/%{engine_name}
-%global engine_restapi_war %{engine_data}/restapi.war
+#%global engine_restapi_war %{engine_data}/restapi.war
 %global engine_run %{_localstatedir}/run/%{engine_name}
 %global engine_state %{_localstatedir}/lib/%{engine_name}
 %global engine_tmp %{_localstatedir}/tmp/%{engine_name}
@@ -190,7 +190,7 @@ Conflicts:	ovirt-engine-wildfly-overlay >= 11.0.0
 Requires:	%{name}-backend = %{version}-%{release}
 Requires:	%{name}-cli >= 4.0.0.0
 Requires:	%{name}-dbscripts = %{version}-%{release}
-Requires:	%{name}-restapi = %{version}-%{release}
+#Requires:	%{name}-restapi = %{version}-%{release}
 Requires:	%{name}-tools = %{version}-%{release}
 Requires:	%{name}-userportal = %{version}-%{release}
 Requires:	%{name}-webadmin-portal = %{version}-%{release}
@@ -570,7 +570,7 @@ install -dm 755 "%{buildroot}/%{engine_run}/notifier"
 #
 for war in \
 	"%{buildroot}%{engine_ear}"/{userportal,webadmin,enginesso,welcome}.war \
-	"%{buildroot}%{engine_restapi_war}" \
+#	"%{buildroot}%{engine_restapi_war}" \
 	; do
 	sed -i \
 		-e 's#<transport-guarantee>NONE</transport-guarantee>#<transport-guarantee>CONFIDENTIAL</transport-guarantee>#' \
@@ -600,9 +600,9 @@ done << __EOF__
 %{engine_ear}/lib/scheduler.jar
 %{engine_jboss_modules}/common/org/ovirt/engine/api/interface-common-jaxrs/main/interface-common-jaxrs.jar
 %{engine_jboss_modules}/common/org/ovirt/engine/api/ovirt-engine-extensions-api/main/ovirt-engine-extensions-api.jar
-%{engine_jboss_modules}/common/org/ovirt/engine/api/restapi-definition/main/restapi-definition.jar
-%{engine_jboss_modules}/common/org/ovirt/engine/api/restapi-jaxrs/main/restapi-jaxrs.jar
-%{engine_jboss_modules}/common/org/ovirt/engine/api/restapi-types/main/restapi-types.jar
+#%{engine_jboss_modules}/common/org/ovirt/engine/api/restapi-definition/main/restapi-definition.jar
+#%{engine_jboss_modules}/common/org/ovirt/engine/api/restapi-jaxrs/main/restapi-jaxrs.jar
+#%{engine_jboss_modules}/common/org/ovirt/engine/api/restapi-types/main/restapi-types.jar
 %{engine_jboss_modules}/common/org/ovirt/engine/core/aaa/main/aaa.jar
 %{engine_jboss_modules}/common/org/ovirt/engine/core/branding/main/branding.jar
 %{engine_jboss_modules}/common/org/ovirt/engine/core/common/main/common.jar
@@ -662,11 +662,11 @@ base %{name}-utils.pom
 base %{name}-uutils.pom
 extensions-api %{name}-ovirt-engine-extensions-api-root.pom
 extensions-api %{name}-ovirt-engine-extensions-api.pom
-restapi %{name}-interface-common-jaxrs.pom
-restapi %{name}-restapi-definition.pom
-restapi %{name}-restapi-jaxrs.pom
-restapi %{name}-restapi-parent.pom
-restapi %{name}-restapi-types.pom
+#restapi %{name}-interface-common-jaxrs.pom
+#restapi %{name}-restapi-definition.pom
+#restapi %{name}-restapi-jaxrs.pom
+#restapi %{name}-restapi-parent.pom
+#restapi %{name}-restapi-types.pom
 tools %{name}-extensions-tool.pom
 tools %{name}-tools.pom
 __EOF__
@@ -1025,9 +1025,9 @@ fi
 
 %{engine_data}/dbscripts/
 
-%files restapi -f .mfiles-restapi
+#%files restapi -f .mfiles-restapi
 
-%{engine_restapi_war}/
+#%{engine_restapi_war}/
 
 %files userportal
 
