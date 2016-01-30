@@ -571,7 +571,7 @@ public class AddDiskCommand<T extends AddDiskParameters> extends AbstractDiskVmC
 
     @Override
     public AuditLogType getAuditLogTypeValue() {
-        switch (getActionState()) {
+/*        switch (getActionState()) {
         case EXECUTE:
             if (isDiskStorageTypeRequiresExecuteState()) {
                 return getExecuteAuditLogTypeValue(getSucceeded());
@@ -584,6 +584,8 @@ public class AddDiskCommand<T extends AddDiskParameters> extends AbstractDiskVmC
         default:
             return AuditLogType.USER_ADD_DISK_FINISHED_FAILURE;
         }
+*/
+        return AuditLogType.UNASSIGNED;
     }
 
     private boolean isDiskStorageTypeRequiresExecuteState() {
@@ -700,5 +702,9 @@ public class AddDiskCommand<T extends AddDiskParameters> extends AbstractDiskVmC
 
     protected StorageDomainValidator createStorageDomainValidator() {
         return new StorageDomainValidator(getStorageDomain());
+    }
+
+    private boolean isVmNameExists() {
+        return StringUtils.isNotEmpty(getVmName());
     }
 }
