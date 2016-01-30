@@ -2430,9 +2430,6 @@ public abstract class CommandBase<T extends VdcActionParametersBase>
         return withRootCommandInfo(params, getActionType());
     }
 
-    protected void freeLock() {
-    }
-
     private class DefaultCommandTransactionCompletionListener extends NoOpTransactionCompletionListener {
 
         @Override

@@ -164,43 +164,72 @@
 
             /** Command Locks **/
 
+        /** org.ovirt.engine.core.bll.storage.export.ExportVmTemplateCommand **/
+        LockProperties around(LockProperties lockProperties, org.ovirt.engine.core.bll.storage.export.ExportVmTemplateCommand command): execution(* applyLockProperties(..)) && args(lockProperties) && target(command) {
+            return lockProperties.withScope(Scope.Execution).withWait(false);
+        }
+        
+        Map<String, Pair<String, String>> around(org.ovirt.engine.core.bll.storage.export.ExportVmTemplateCommand command): execution(* getExclusiveLocks()) && target(command) {
+            Map<String, Pair<String, String>> locks = new HashMap<String, Pair<String, String>>();
+        
+                   locks.put(command.getVmTemplateId().toString(),
+                       LockMessagesMatchUtil.makeLockingPair(LockingGroup.REMOTE_TEMPLATE,
+                        "ACTION_TYPE_FAILED_TEMPLATE_IS_BEING_EXPORTED"+"$TemplateName "+command.getVmTemplateName()));
+        
+            return locks;
+        }
+        
+        Map<String, Pair<String, String>> around(org.ovirt.engine.core.bll.storage.export.ExportVmTemplateCommand command): execution(* getSharedLocks()) && target(command) {
+            Map<String, Pair<String, String>> locks = new HashMap<String, Pair<String, String>>();
+        
+                   locks.put(command.getVmTemplateId().toString(),
+                       LockMessagesMatchUtil.makeLockingPair(LockingGroup.TEMPLATE,
+                        "ACTION_TYPE_FAILED_TEMPLATE_IS_BEING_EXPORTED"+"$TemplateName "+command.getVmTemplateName()));
+        
+            return locks;
+        }
+        
         /** org.ovirt.engine.core.bll.MigrateVmCommand **/
-            LockProperties around(LockProperties lockProperties, org.ovirt.engine.core.bll.MigrateVmCommand command): execution(* applyLockProperties(..)) && args(lockProperties) && target(command) {
-                return lockProperties.withScope(Scope.Command).withWait(false);
-            }
+        LockProperties around(LockProperties lockProperties, org.ovirt.engine.core.bll.MigrateVmCommand command): execution(* applyLockProperties(..)) && args(lockProperties) && target(command) {
+            return lockProperties.withScope(Scope.Command).withWait(false);
+        }
         
-            Map<String, Pair<String, String>> around(org.ovirt.engine.core.bll.MigrateVmCommand command): execution(* getExclusiveLocks()) && target(command) {
-                Map<String, Pair<String, String>> locks = new HashMap<String, Pair<String, String>>();
+        Map<String, Pair<String, String>> around(org.ovirt.engine.core.bll.MigrateVmCommand command): execution(* getExclusiveLocks()) && target(command) {
+            Map<String, Pair<String, String>> locks = new HashMap<String, Pair<String, String>>();
         
-                locks.put(command.getVmId().toString(),
-                    LockMessagesMatchUtil.makeLockingPair(LockingGroup.VM, EngineMessage.ACTION_TYPE_FAILED_OBJECT_LOCKED));
+                   locks.put(command.getVmId().toString(),
+                       LockMessagesMatchUtil.makeLockingPair(LockingGroup.VM,
+                        "ACTION_TYPE_FAILED_VM_IS_BEING_MIGRATED"+"$VmName "+command.getVmName()));
         
-                return locks;
-            }
+            return locks;
+        }
         
         
-        /** org.ovirt.engine.core.bll.AddDiskCommand **/
-            LockProperties around(LockProperties lockProperties, org.ovirt.engine.core.bll.storage.disk.AddDiskCommand command): execution(* applyLockProperties(..)) && args(lockProperties) && target(command) {
-                return lockProperties.withScope(Scope.Execution).withWait(false);
-            }
+        /** org.ovirt.engine.core.bll.storage.disk.AddDiskCommand **/
+        LockProperties around(LockProperties lockProperties, org.ovirt.engine.core.bll.storage.disk.AddDiskCommand command): execution(* applyLockProperties(..)) && args(lockProperties) && target(command) {
+            return lockProperties.withScope(Scope.Execution).withWait(false);
+        }
         
-            Map<String, Pair<String, String>> around(org.ovirt.engine.core.bll.storage.disk.AddDiskCommand command): execution(* getExclusiveLocks()) && target(command) {
-                Map<String, Pair<String, String>> locks = new HashMap<String, Pair<String, String>>();
+        Map<String, Pair<String, String>> around(org.ovirt.engine.core.bll.storage.disk.AddDiskCommand command): execution(* getExclusiveLocks()) && target(command) {
+            Map<String, Pair<String, String>> locks = new HashMap<String, Pair<String, String>>();
         
-                locks.put(command.getVmId().toString(),
-                    LockMessagesMatchUtil.makeLockingPair(LockingGroup.VM_DISK_BOOT, EngineMessage.ACTION_TYPE_FAILED_OBJECT_LOCKED));
+            if (command.isBootableDisk())
+                   locks.put(command.getVmId().toString(),
+                       LockMessagesMatchUtil.makeLockingPair(LockingGroup.VM_DISK_BOOT,
+                        EngineMessage.ACTION_TYPE_FAILED_OBJECT_LOCKED));
         
-                return locks;
-            }
+            return locks;
+        }
         
-            Map<String, Pair<String, String>> around(org.ovirt.engine.core.bll.storage.disk.AddDiskCommand command): execution(* getSharedLocks()) && target(command) {
-                Map<String, Pair<String, String>> locks = new HashMap<String, Pair<String, String>>();
+        Map<String, Pair<String, String>> around(org.ovirt.engine.core.bll.storage.disk.AddDiskCommand command): execution(* getSharedLocks()) && target(command) {
+            Map<String, Pair<String, String>> locks = new HashMap<String, Pair<String, String>>();
         
-                locks.put(command.getVmId().toString(),
-                    LockMessagesMatchUtil.makeLockingPair(LockingGroup.VM, EngineMessage.ACTION_TYPE_FAILED_OBJECT_LOCKED));
+                   locks.put(command.getVmId().toString(),
+                       LockMessagesMatchUtil.makeLockingPair(LockingGroup.VM,
+                        EngineMessage.ACTION_TYPE_FAILED_OBJECT_LOCKED));
         
-                return locks;
-            }
+            return locks;
+        }
         
         }
 
