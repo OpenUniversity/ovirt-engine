@@ -337,13 +337,7 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
      */
     @Override
     public AuditLogType getAuditLogTypeValue() {
-        return getSucceeded() ?
-                getActionReturnValue() == VMStatus.Up ?
-                        AuditLogType.VM_MIGRATION_DONE
-                        : getAuditLogForMigrationStarted()
-                : _isRerun ?
-                        AuditLogType.VM_MIGRATION_TRYING_RERUN
-                        : getAuditLogForMigrationFailure();
+        return AuditLogType.UNASSIGNED;
     }
 
     private AuditLogType getAuditLogForMigrationStarted() {
@@ -551,5 +545,13 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
     @Override
     public void onPowerringUp() {
         // nothing to do
+    }
+
+    protected boolean isReturnValueUp() {
+            return getActionReturnValue() == VMStatus.Up;
+    }
+
+    private boolean isHostInPrepareForMaintenance() {
+            return getVds().getStatus() == VDSStatus.PreparingForMaintenance;
     }
 }
