@@ -133,7 +133,7 @@ public class UpdateNetworkOnClusterCommand<T extends NetworkClusterParameters> e
      * Checks the user has permissions either on Network or on Cluster for this action.<br>
      */
     @Override
-    protected boolean checkPermissions(final List<PermissionSubject> permSubjects) {
+    public boolean checkPermissions(final List<PermissionSubject> permSubjects) {
         return permissionsChecker.checkPermissions(this, permSubjects);
     }
 

@@ -63,7 +63,7 @@ public class TerminateSessionCommand<T extends TerminateSessionParameters> exten
     }
 
     @Override
-    protected boolean isUserAuthorizedToRunAction() {
+    public boolean isUserAuthorizedToRunAction() {
         if (isSystemSuperUserPredicate.test(getCurrentUser().getId())) {
             return true;
         } else {

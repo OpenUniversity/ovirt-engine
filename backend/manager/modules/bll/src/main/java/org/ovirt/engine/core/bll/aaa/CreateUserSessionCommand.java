@@ -124,7 +124,7 @@ public class CreateUserSessionCommand<T extends CreateUserSessionParameters> ext
     }
 
     @Override
-    protected boolean isUserAuthorizedToRunAction() {
+    public boolean isUserAuthorizedToRunAction() {
         return true;
     }
 

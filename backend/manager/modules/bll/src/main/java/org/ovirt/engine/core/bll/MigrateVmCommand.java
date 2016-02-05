@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.ovirt.engine.core.bll.context.CommandContext;
@@ -11,7 +12,6 @@ import org.ovirt.engine.core.bll.job.ExecutionHandler;
 import org.ovirt.engine.core.bll.scheduling.VdsFreeMemoryChecker;
 import org.ovirt.engine.core.bll.snapshots.SnapshotsValidator;
 import org.ovirt.engine.core.bll.storage.disk.image.ImagesHandler;
-import org.ovirt.engine.core.bll.utils.PermissionSubject;
 import org.ovirt.engine.core.bll.validator.VmValidator;
 import org.ovirt.engine.core.bll.validator.storage.DiskImagesValidator;
 import org.ovirt.engine.core.common.AuditLogType;
@@ -526,23 +526,6 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
     }
 
     @Override
-    public List<PermissionSubject> getPermissionCheckSubjects() {
-        List<PermissionSubject> permissionList = super.getPermissionCheckSubjects();
-
-        // this runs before validate so the getVm() can be null - instead of failing on NPE here we pass the parent permissions and let the validate to return proper error
-        if (getVm() == null) {
-            return permissionList;
-        }
-
-        if (getParameters().getTargetClusterId() != null && !getParameters().getTargetClusterId().equals(getVm().getClusterId())) {
-            // additional permissions needed since changing the cluster
-            permissionList.addAll(VmHandler.getPermissionsNeededToChangeCluster(getParameters().getVmId(), getParameters().getTargetClusterId()));
-        }
-
-        return permissionList;
-    }
-
-    @Override
     public void onPowerringUp() {
         // nothing to do
     }
@@ -553,5 +536,9 @@ public class MigrateVmCommand<T extends MigrateVmParameters> extends RunVmComman
 
     private boolean isHostInPrepareForMaintenance() {
             return getVds().getStatus() == VDSStatus.PreparingForMaintenance;
+    }
+
+    private boolean isClusterChange() {
+            return getVm() != null && !Objects.equals(getParameters().getTargetClusterId(), getVm().getClusterId());
     }
 }

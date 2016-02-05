@@ -177,7 +177,7 @@ public final class ManageNetworkClustersCommand extends CommandBase<ManageNetwor
     }
 
     @Override
-    protected boolean checkPermissions(final List<PermissionSubject> permSubjects) {
+    public boolean checkPermissions(final List<PermissionSubject> permSubjects) {
         return checkAttachmentPermissions() && checkDetachmentsPermissions() && checkUpdatesPermissions();
     }
 

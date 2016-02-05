@@ -50,7 +50,7 @@ public class LogoutSessionCommand<T extends VdcActionParametersBase> extends Com
     }
 
     @Override
-    protected boolean isUserAuthorizedToRunAction() {
+    public boolean isUserAuthorizedToRunAction() {
         return true;
     }
 

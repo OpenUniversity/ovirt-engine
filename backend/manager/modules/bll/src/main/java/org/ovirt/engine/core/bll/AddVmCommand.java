@@ -1264,7 +1264,7 @@ public class AddVmCommand<T extends AddVmParameters> extends VmManagementCommand
      * user need permission on each object used: template, instance type, image type.
      */
     @Override
-    protected boolean checkPermissions(final List<PermissionSubject> permSubjects) {
+    public boolean checkPermissions(final List<PermissionSubject> permSubjects) {
 
         if (getInstanceTypeId() != null && !checkInstanceTypeImagePermissions(getInstanceTypeId())) {
             return false;

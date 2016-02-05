@@ -19,7 +19,6 @@ import org.ovirt.engine.core.bll.quota.QuotaStorageDependent;
 import org.ovirt.engine.core.bll.storage.disk.image.ImagesHandler;
 import org.ovirt.engine.core.bll.storage.domain.StorageDomainCommandBase;
 import org.ovirt.engine.core.bll.tasks.CommandCoordinatorUtil;
-import org.ovirt.engine.core.bll.utils.PermissionSubject;
 import org.ovirt.engine.core.bll.utils.VmDeviceUtils;
 import org.ovirt.engine.core.bll.validator.storage.CinderDisksValidator;
 import org.ovirt.engine.core.bll.validator.storage.DiskValidator;
@@ -34,7 +33,7 @@ import org.ovirt.engine.core.common.action.VdcActionParametersBase;
 import org.ovirt.engine.core.common.action.VdcActionType;
 import org.ovirt.engine.core.common.action.VdcReturnValueBase;
 import org.ovirt.engine.core.common.asynctasks.EntityInfo;
-import org.ovirt.engine.core.common.businessentities.ActionGroup;
+//import org.ovirt.engine.core.common.businessentities.ActionGroup;
 import org.ovirt.engine.core.common.businessentities.Permission;
 import org.ovirt.engine.core.common.businessentities.Snapshot.SnapshotType;
 import org.ovirt.engine.core.common.businessentities.StoragePool;
@@ -378,33 +377,6 @@ public class AddDiskCommand<T extends AddDiskParameters> extends AbstractDiskVmC
     }
 
     @Override
-    public List<PermissionSubject> getPermissionCheckSubjects() {
-        List<PermissionSubject> listPermissionSubjects;
-        if (getParameters().getVmId() == null || Guid.Empty.equals(getParameters().getVmId())) {
-            listPermissionSubjects = new ArrayList<>();
-        } else {
-            listPermissionSubjects = super.getPermissionCheckSubjects();
-        }
-        // If the storage domain ID is empty/null, it means we are going to create an external disk
-        // In order to do that we need CREATE_DISK permissions on System level
-        if (getParameters().getStorageDomainId() == null || Guid.Empty.equals(getParameters().getStorageDomainId())) {
-            listPermissionSubjects.add(new PermissionSubject(Guid.SYSTEM,
-                    VdcObjectType.System,
-                    ActionGroup.CREATE_DISK));
-            if (getParameters().getDiskInfo().getSgio() == ScsiGenericIO.UNFILTERED) {
-                listPermissionSubjects.add(new PermissionSubject(Guid.SYSTEM,
-                        VdcObjectType.System,
-                        ActionGroup.CONFIGURE_SCSI_GENERIC_IO));
-            }
-        } else {
-            listPermissionSubjects.add(new PermissionSubject(getParameters().getStorageDomainId(),
-                    VdcObjectType.Storage,
-                    ActionGroup.CREATE_DISK));
-        }
-        return listPermissionSubjects;
-    }
-
-    @Override
     protected void setActionMessageParameters() {
         addValidationMessage(EngineMessage.VAR__ACTION__ADD);
         addValidationMessage(EngineMessage.VAR__TYPE__VM_DISK);
@@ -707,4 +679,21 @@ public class AddDiskCommand<T extends AddDiskParameters> extends AbstractDiskVmC
     private boolean isVmNameExists() {
         return StringUtils.isNotEmpty(getVmName());
     }
+
+    private boolean isSgioUnfiltered() {
+            return getParameters().getDiskInfo().getSgio() == ScsiGenericIO.UNFILTERED;
+    }
+    private Guid getSystemGuid() {
+            return Guid.SYSTEM;
+    }
+    private Guid getStorageDomainSet() {
+            return getParameters().getStorageDomainId();
+    }
+    private boolean isVmSet() {
+            return !Guid.isNullOrEmpty(getParameters().getVmId());
+    }
+    private boolean isStorageDomainSet() {
+            return !Guid.isNullOrEmpty(getParameters().getStorageDomainId());
+    }
+
 }
