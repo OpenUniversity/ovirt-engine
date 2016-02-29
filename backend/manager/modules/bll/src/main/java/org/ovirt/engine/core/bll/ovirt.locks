@@ -1,0 +1,16 @@
+locks for org.ovirt.engine.core.bll.MigrateVmCommand (async):
+        exclusively (overrides) {
+                group: VM instance: getVmId
+        }
+        message: ACTION_TYPE_FAILED_VM_IS_BEING_MIGRATED <"VmName", getVmName>
+;
+
+//locks for org.ovirt.engine.core.bll.storage.disk.AddDiskCommand (sync):
+//        exclusively (overrides) {
+//                group: VM_DISK_BOOT instance: getVmId if isBootableDisk
+//        }
+//        inclusively (overrides) {
+//                group: VM instance: getVmId
+//        }
+//;
+
