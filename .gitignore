@@ -26,6 +26,7 @@ maven-eclipse.xml
 *.iml
 .idea
 .pydevproject
+src-gen
 
 # python files
 ###########################
