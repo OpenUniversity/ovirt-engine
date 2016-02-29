@@ -1,0 +1,47 @@
+logs for org.ovirt.engine.core.bll.MigrateVmCommand (overrides):
+case success & isReturnValueUp
+ log VM_MIGRATION_DONE,
+case success & internal 
+ log VM_MIGRATION_START_SYSTEM_INITIATED,
+case success
+ log VM_MIGRATION_START,
+case failure & isHostInPrepareForMaintenance
+ log VM_MIGRATION_FAILED_DURING_MOVE_TO_MAINTENANCE,
+case failure
+ log VM_MIGRATION_FAILED
+;
+
+logs for org.ovirt.engine.core.bll.storage.export.ExportVmTemplateCommand:
+ case EXECUTE & success
+  log IMPORTEXPORT_STARTING_EXPORT_TEMPLATE,
+ case EXECUTE & failure
+  log IMPORTEXPORT_EXPORT_TEMPLATE_FAILED,
+ case END_SUCCESS & success
+  log IMPORTEXPORT_EXPORT_TEMPLATE,
+ case END_SUCCESS & failure
+  log IMPORTEXPORT_EXPORT_TEMPLATE_FAILED
+;
+
+logs for org.ovirt.engine.core.bll.storage.disk.AddDiskCommand :
+case EXECUTE & success & internal & isDiskStorageTypeRequiresExecuteState
+ log ADD_DISK_INTERNAL,
+case EXECUTE & success & isDiskStorageTypeRequiresExecuteState & isVmNameExists
+ log USER_ADD_DISK_TO_VM,
+case EXECUTE & success & isDiskStorageTypeRequiresExecuteState
+ log USER_ADD_DISK,
+case EXECUTE & failure & internal & isDiskStorageTypeRequiresExecuteState
+ log ADD_DISK_INTERNAL_FAILURE,
+case EXECUTE & failure & isDiskStorageTypeRequiresExecuteState & isVmNameExists
+ log USER_FAILED_ADD_DISK_TO_VM,
+case EXECUTE & failure & isDiskStorageTypeRequiresExecuteState
+ log USER_FAILED_ADD_DISK,
+case success & isVmNameExists
+ log USER_ADD_DISK_TO_VM_FINISHED_SUCCESS,
+case success
+ log USER_ADD_DISK_FINISHED_SUCCESS,
+case failure & isVmNameExists
+ log USER_ADD_DISK_TO_VM_FINISHED_FAILURE,
+otherwise
+ log USER_ADD_DISK_FINISHED_FAILURE
+;
+
