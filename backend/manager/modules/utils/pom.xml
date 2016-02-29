@@ -168,20 +168,6 @@
         </configuration>
       </plugin>
 
-      <!-- Generate osinfo parser from grammer file-->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>javacc-maven-plugin</artifactId>
-        <version>${javacc.version}</version>
-        <executions>
-          <execution>
-              <id>javacc</id>
-              <goals>
-                  <goal>javacc</goal>
-              </goals>
-          </execution>
-        </executions>
-    </plugin>
     </plugins>
   </build>
 

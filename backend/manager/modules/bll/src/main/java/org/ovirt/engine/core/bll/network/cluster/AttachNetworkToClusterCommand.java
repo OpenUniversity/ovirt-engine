@@ -65,7 +65,6 @@ public class AttachNetworkToClusterCommand extends NetworkClusterCommandBase<Att
                 getActionType());
     }
 
-    @Override
     public boolean checkPermissions(final List<PermissionSubject> permSubjects) {
         return permissionsChecker.checkPermissions(this, permSubjects);
     }

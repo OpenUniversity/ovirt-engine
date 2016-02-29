@@ -176,7 +176,6 @@ public final class ManageNetworkClustersCommand extends CommandBase<ManageNetwor
         return result;
     }
 
-    @Override
     public boolean checkPermissions(final List<PermissionSubject> permSubjects) {
         return checkAttachmentPermissions() && checkDetachmentsPermissions() && checkUpdatesPermissions();
     }
@@ -202,11 +201,11 @@ public final class ManageNetworkClustersCommand extends CommandBase<ManageNetwor
                             DetachNetworkToCluster);
             for (PermissionSubject permissionSubject : permissionCheckSubjects) {
                 final ArrayList<String> messages = new ArrayList<>();
-                final boolean isUserAllowed = checkSinglePermission(permissionSubject, messages);
-                if (!isUserAllowed) {
-                    getReturnValue().getValidationMessages().addAll(messages);
-                    return false;
-                }
+//                final boolean isUserAllowed = checkSinglePermission(permissionSubject, messages);
+//                if (!isUserAllowed) {
+//                    getReturnValue().getValidationMessages().addAll(messages);
+//                    return false;
+//                }
             }
         }
         return true;

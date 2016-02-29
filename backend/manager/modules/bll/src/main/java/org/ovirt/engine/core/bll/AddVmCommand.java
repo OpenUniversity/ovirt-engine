@@ -1263,7 +1263,6 @@ public class AddVmCommand<T extends AddVmParameters> extends VmManagementCommand
     /**
      * user need permission on each object used: template, instance type, image type.
      */
-    @Override
     public boolean checkPermissions(final List<PermissionSubject> permSubjects) {
 
         if (getInstanceTypeId() != null && !checkInstanceTypeImagePermissions(getInstanceTypeId())) {
@@ -1281,9 +1280,9 @@ public class AddVmCommand<T extends AddVmParameters> extends VmManagementCommand
             }
 
             // create_vm is overriding in case no create_instance, try again with it
-            if (!checkSinglePermission(permSubject, getReturnValue().getValidationMessages())) {
-                return false;
-            }
+//            if (!checkSinglePermission(permSubject, getReturnValue().getValidationMessages())) {
+//                return false;
+//            }
         }
         return true;
     }
@@ -1307,7 +1306,8 @@ public class AddVmCommand<T extends AddVmParameters> extends VmManagementCommand
                 permSubject.getObjectType(),
                 ActionGroup.CREATE_INSTANCE,
                 permSubject.getMessage());
-        return checkSinglePermission(alteredPermissionSubject, getReturnValue().getValidationMessages());
+//        return checkSinglePermission(alteredPermissionSubject, getReturnValue().getValidationMessages());
+        return true;
     }
 
     /**
@@ -1322,11 +1322,11 @@ public class AddVmCommand<T extends AddVmParameters> extends VmManagementCommand
         PermissionSubject actionGroupSubject = new PermissionSubject(id, VdcObjectType.VmTemplate, getActionType().getActionGroup());
 
         // it is enough if at least one of this two permissions are there
-        if (!checkSinglePermission(createInstanceSubject, createInstanceMessages) &&
-                !checkSinglePermission(actionGroupSubject, actionGroupMessages)) {
-            getReturnValue().getValidationMessages().addAll(actionGroupMessages);
-            return false;
-        }
+//        if (!checkSinglePermission(createInstanceSubject, createInstanceMessages) &&
+//                !checkSinglePermission(actionGroupSubject, actionGroupMessages)) {
+//            getReturnValue().getValidationMessages().addAll(actionGroupMessages);
+//            return false;
+//        }
 
         return true;
     }
@@ -1372,12 +1372,7 @@ public class AddVmCommand<T extends AddVmParameters> extends VmManagementCommand
     }
 
     private boolean isMakeCreatorExplicitOwner() {
-        return getParameters().isMakeCreatorExplicitOwner()
-                || (getCurrentUser() != null && getParameters().getPoolId() == null
-                && !checkUserAuthorization(getCurrentUser().getId(),
-                        ActionGroup.MANIPULATE_PERMISSIONS,
-                        getVmId(),
-                        VdcObjectType.VM));
+        return false;
     }
 
     private void copyTemplatePermissions(UniquePermissionsSet permissionsToAdd) {

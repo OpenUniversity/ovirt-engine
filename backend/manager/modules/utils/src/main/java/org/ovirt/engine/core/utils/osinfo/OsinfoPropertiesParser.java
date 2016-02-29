@@ -12,30 +12,30 @@ public class OsinfoPropertiesParser {
      */
     public static void parse(String path) {
 
-        try (FileInputStream inputStream = new FileInputStream(path)) {
-            OsInfoParser parser = new OsInfoParser(inputStream);
-            parser.parse();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(
-                    String.format("osinfo properties file cannot be found: %s", path),
-                    e
-            );
-        } catch (IOException e) {
-            throw new RuntimeException(
-                    String.format("error while reading osinfo properties file: %s", path),
-                    e
-            );
-        } catch (ParseException e) {
-            throw new RuntimeException(
-                String.format(
-                    "osinfo properties syntax error: %s: %d, %d: error: %s",
-                    path,
-                    e.currentToken.beginLine,
-                    e.currentToken.beginColumn,
-                    e.getMessage()
-                ),
-                e
-            );
-        }
+//        try (FileInputStream inputStream = new FileInputStream(path)) {
+//            OsInfoParser parser = new OsInfoParser(inputStream);
+//            parser.parse();
+//        } catch (FileNotFoundException e) {
+//            throw new RuntimeException(
+//                    String.format("osinfo properties file cannot be found: %s", path),
+//                    e
+//            );
+//        } catch (IOException e) {
+//            throw new RuntimeException(
+//                    String.format("error while reading osinfo properties file: %s", path),
+//                    e
+//            );
+//        } catch (ParseException e) {
+//            throw new RuntimeException(
+//                String.format(
+//                    "osinfo properties syntax error: %s: %d, %d: error: %s",
+//                    path,
+//                    e.currentToken.beginLine,
+//                    e.currentToken.beginColumn,
+//                    e.getMessage()
+//                ),
+//                e
+//            );
+//        }
     }
 }

@@ -123,7 +123,6 @@ public class CreateUserSessionCommand<T extends CreateUserSessionParameters> ext
         return accumulator;
     }
 
-    @Override
     public boolean isUserAuthorizedToRunAction() {
         return true;
     }

@@ -45,7 +45,6 @@ public class TerminateSessionsForTokenCommand<T extends TerminateSessionsForToke
         setSucceeded(true);
     }
 
-    @Override
     public boolean isUserAuthorizedToRunAction() {
         return true;
     }

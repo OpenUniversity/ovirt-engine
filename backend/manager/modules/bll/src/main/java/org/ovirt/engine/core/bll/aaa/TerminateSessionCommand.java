@@ -62,7 +62,6 @@ public class TerminateSessionCommand<T extends TerminateSessionParameters> exten
                         new VdcActionParametersBase(terminatedSessionId)));
     }
 
-    @Override
     public boolean isUserAuthorizedToRunAction() {
         if (isSystemSuperUserPredicate.test(getCurrentUser().getId())) {
             return true;

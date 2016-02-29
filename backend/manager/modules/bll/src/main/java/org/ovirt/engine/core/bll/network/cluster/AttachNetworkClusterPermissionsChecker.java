@@ -20,9 +20,9 @@ class AttachNetworkClusterPermissionsChecker {
 
         for (PermissionSubject permSubject : permissionCheckSubjects) {
             messages.clear();
-            if (command.checkSinglePermission(permSubject, messages)) {
-                return true;
-            }
+//            if (command.checkSinglePermission(permSubject, messages)) {
+//                return true;
+//            }
         }
 
         command.getReturnValue().getValidationMessages().addAll(messages);
